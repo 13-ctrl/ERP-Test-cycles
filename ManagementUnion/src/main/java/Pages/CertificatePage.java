@@ -1,13 +1,13 @@
 package Pages;
 
 import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class CertificatePage extends PageBase {
 
     public CertificatePage(WebDriver driver) {
-        super(driver);
+        super(driver); //calls PageBase constructor
     }
-
     // Step 1: Confirm Dashboard present
     private By dashboardH3 = By.xpath("//h3[@class='box-title' and normalize-space()='Dashboard']");
 
@@ -26,22 +26,32 @@ public class CertificatePage extends PageBase {
 
     // Step 5: Certificate of incorporation
     private By certificateBtn = By.id("BtnAddExtractinPpermissionArranged");
+    //private By certificateBtn = By.id("BtnAddRegistration");
+
+
     // Step 6-7: Company names
     private By companyNameAR = By.id("CopmanyNameAR");
     private By companyNameEN = By.id("CopmanyNameEN");
 
-    // Step 8: Legal Entity -> arrow -> option 'فردي'
-    private By legalEntityInput = By.xpath("//input[@name='LegalEntityId_input']");
+    // Step 8, 9
+    public void selectFirstOption(String listboxId) {
+        // Click dropdown arrow
+        By dropdownArrow = By.xpath("//span[@aria-controls='" + listboxId + "']");
+        WebElement arrow = wait.until(ExpectedConditions.elementToBeClickable(dropdownArrow));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", arrow);
 
-    // Step 8 (sector): open -> choose 'Class A'
-    private By sectorInput = By.xpath("//input[@name='SectorId_input']");
+        // Wait until the listbox is visible
+        By firstOptionLocator = By.xpath("//ul[@id='" + listboxId + "']/li[1]");
+        WebElement firstOption = wait.until(ExpectedConditions.visibilityOfElementLocated(firstOptionLocator));
 
-    // Step 9: Classification -> choose 'Direct'
-    private By classificationInput = By.name("ClassificationId_input");
+        // Click first option
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", firstOption);
+    }
 
     // Step 10: Save and success message
-    //private By saveBtn = By.xpath("//button[@id='BtnSaveMemberShipRegiteration' and normalize-space()='Save']");
-    private By successMessageLabel = By.id("lblAlertMsg");
+    private By saveButton = By.id("BtnSaveMemberShipRegiteration");
+    //step 11
+    private By successMessage = By.id("lblAlertMsg");
 
 
     //  Actions
@@ -84,39 +94,44 @@ public class CertificatePage extends PageBase {
         type(companyNameEN, value);
     }
 
-    // Step 8 (legal entity)
+    // step 8 , 9
+   // Step-specific helpers
     public void chooseLegalEntity_Individual() {
-        // type directly in the input field
-        driver.findElement(legalEntityInput).sendKeys("فردي");
-
-        // press ENTER to confirm selection
-        driver.findElement(legalEntityInput).sendKeys(Keys.ENTER);
+        selectFirstOption("LegalEntityId_listbox");
     }
 
-    // Step 8 (sector)
     public void chooseSector_ClassA() {
-        WebElement input = driver.findElement(sectorInput);
-        input.clear(); // clear in case something is already typed
-        input.sendKeys("Class A");
-        input.sendKeys(Keys.ENTER); // confirm selection
+        selectFirstOption("SectorId_listbox");
     }
 
-    // Step 9
     public void chooseClassification_Direct() {
-        WebElement input = driver.findElement(classificationInput);
-        input.clear(); // clear in case something is already typed
-        input.sendKeys("Direct");
-        input.sendKeys(Keys.ENTER); // confirm selection
+        selectFirstOption("ClassificationId_listbox");
     }
+
 
     // Step 10
     public void saveRegistration() {
-        WebElement saveButton = driver.findElement(By.id("BtnSaveMemberShipRegiteration"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", saveButton);
+        WebElement button = wait.until(ExpectedConditions.presenceOfElementLocated(saveButton));
+
+        // Scroll into view (sometimes offscreen)
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", button);
+
+        wait.until(ExpectedConditions.elementToBeClickable(button));
+
+        try {
+            button.click();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", button);
+        }
     }
 //step11
-    public boolean isSaveSuccessful() {
-        return visible(successMessageLabel).isDisplayed();
-    }
+public boolean isSaveSuccessful() {
+    // Wait until the label contains the text "Saved Successfully"
+    return wait.until(ExpectedConditions.textToBePresentInElementLocated(
+            successMessage, "Saved Successfully"
+    ));
+}
+
+
 
 }
