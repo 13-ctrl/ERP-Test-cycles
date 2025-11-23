@@ -22,8 +22,8 @@ public class CertificatePageTest extends TestBase {
         String companyName = "testAutomation";
         // Step 1: Login
         LoginPage login = new LoginPage(driver);
-        login.enterUsername("mernan");
-        login.enterPassword("123456");
+        login.enterUsername("Anasbayoumi");
+        login.enterPassword("Anas123");
         login.clickLogin();
 
         // Step 2: ensure Dashboard then open nav
