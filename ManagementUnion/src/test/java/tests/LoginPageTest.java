@@ -26,8 +26,8 @@ public class LoginPageTest extends TestBase {
 
     @Test
     public void testValidLogin() {
-        loginPage.enterUsername("mernan");
-        loginPage.enterPassword("123456");
+        loginPage.enterUsername("Anasbayoumi");
+        loginPage.enterPassword("Anas123");
         loginPage.clickLogin();
 
         String dashboardTitle = loginPage.getDashboardTitle();
